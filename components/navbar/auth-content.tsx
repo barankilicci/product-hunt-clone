@@ -1,3 +1,4 @@
+import { signIn } from "next-auth/react";
 import Image from "next/image";
 import { FaGithub } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
@@ -21,12 +22,18 @@ const AuthContent = () => {
           latest product in tech.
         </div>
       </div>
-      <button className="border rounded-md py-2 mt-4 flex items-center gap-4 px-10">
-        <FcGoogle className="text-xl"/>
+      <button
+        onClick={() => signIn("google", { redirect: false })}
+        className="border rounded-md py-2 mt-4 flex items-center gap-4 px-10"
+      >
+        <FcGoogle className="text-xl" />
         Sign in with Google
       </button>
-      <button className="border rounded-md py-2 mt-4 flex items-center gap-4 px-10">
-        <FaGithub className="text-xl text-purple-800"/>
+      <button
+        onClick={() => signIn("github")}
+        className="border rounded-md py-2 mt-4 flex items-center gap-4 px-10"
+      >
+        <FaGithub className="text-xl text-purple-800" />
         Sign in with Github
       </button>
     </div>

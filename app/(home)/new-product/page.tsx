@@ -5,6 +5,24 @@ import { LogoUploader } from "@/components/logo-uploader";
 import Image from "next/image";
 import React, { useCallback, useState } from "react";
 
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { cn } from "@/lib/utils";
+import {
+  PiCalendar,
+  PiDiscordLogoFill,
+  PiPlanet,
+  PiTwitterLogoFill,
+} from "react-icons/pi";
+import { format } from "date-fns";
+import { Separator } from "@/components/ui/separator";
+import { createProduct } from "@/lib/server-actions";
+
 const categories = [
   "Media",
   "Blockchain",
@@ -35,11 +53,18 @@ const categories = [
 ];
 
 const NewProduct = () => {
+  const [loading, setLoading] = useState(false);
   const [step, setStep] = useState(1);
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
   const [headline, setHeadline] = useState("");
   const [shortDescription, setShortDescription] = useState("");
+  const [website, setWebsite] = useState("");
+  const [twitter, setTwitter] = useState("");
+  const [discord, setDiscord] = useState("");
+
+  const [date, setDate] = React.useState<Date | undefined>(new Date());
+
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [uploadedProductImages, setUploadedProductImages] = useState<string[]>(
     []
@@ -71,6 +96,18 @@ const NewProduct = () => {
     }
   };
 
+  const handleWebsiteChange = (e: any) => {
+    setWebsite(e.target.value);
+  };
+
+  const handleTwitterChange = (e: any) => {
+    setTwitter(e.target.value);
+  };
+
+  const handleDiscordChange = (e: any) => {
+    setDiscord(e.target.value);
+  };
+
   const handleLogoUpload = useCallback((url: any) => {
     setUploadedLogoUrl(url);
   }, []);
@@ -84,13 +121,60 @@ const NewProduct = () => {
     setShortDescription(e.target.value.slice(0, 300));
   };
 
-  const handleProductImagesUpload = useCallback((urls:string[]) =>{
+  const handleProductImagesUpload = useCallback((urls: string[]) => {
     setUploadedProductImages(urls);
-  },[]);
+  }, []);
 
   const nextStep = useCallback(() => {
     setStep(step + 1);
   }, [step]);
+
+  const prevStep = useCallback(() => {
+    setStep(step - 1);
+  }, [step]);
+
+  const handleGoToProducts = () => {
+    window.location.href = "/my-products";
+  };
+
+  const submitAnotherProduct = () => {
+    setStep(1);
+    setName("");
+    setSlug("");
+    setHeadline("");
+    setShortDescription("");
+    setDate(new Date());
+    setWebsite("");
+    setTwitter("");
+    setDiscord("");
+    setSelectedCategories([]);
+    setUploadedProductImages([]);
+    setUploadedLogoUrl("");
+  };
+
+  const submitProduct = async () => {
+    setLoading(true);
+    const formattedDate = date ? format(date, "MM/dd/yyyy") : "";
+    try {
+      await createProduct({
+        name,
+        slug,
+        headline,
+        website,
+        twitter,
+        discord,
+        description: shortDescription,
+        category: selectedCategories,
+        logo: uploadedLogoUrl,
+        images: uploadedProductImages,
+        releaseDate: formattedDate,
+      });
+      setStep(8);
+    } catch (error) {
+      console.log(error);
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="flex items-center justify-center py-8 md:py-20">
@@ -256,9 +340,232 @@ const NewProduct = () => {
           </div>
         )}
 
-        <button onClick={nextStep} className="mt-20">
-          Next
-        </button>
+        {step === 5 && (
+          <div className="space-y-10">
+            <h1 className="text-4xl font-semibold">🗓️ Release Date</h1>
+            <p className="text-xl font-light mt-4 leading-8">
+              When will your product be available to the public? Select a date
+              to continue.
+            </p>
+            <div className="mt-10">
+              <>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant={"outline"}
+                      className={cn(
+                        "w-[300px] pl-3 text-left font-normal",
+                        !date && "text-muted-foreground"
+                      )}
+                    >
+                      {date ? format(date, "PPP") : <span>Pick a date</span>}
+                      <PiCalendar className="ml-auto h-4 w-4 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={date}
+                      onSelect={(date) => setDate(date)}
+                      initialFocus
+                      disabled={(date) => date < new Date()}
+                    />
+                  </PopoverContent>
+                </Popover>
+              </>
+            </div>
+          </div>
+        )}
+
+        {step === 6 && (
+          <div className="space-y-10">
+            <h1 className="text-4xl font-semibold">Additional Links</h1>
+            <p className="text-xl font-light mt-4 leading-8">
+              Add links to your product&apos;s website, social media,and other
+              platforms.
+            </p>
+            <div className="mt-10">
+              <div className="font-medium flex items-center gap-x-2">
+                <PiPlanet className="text-2xl text-gray-600" />
+                <span>Website</span>
+              </div>
+              <input
+                type="text"
+                value={website}
+                onChange={handleWebsiteChange}
+                className="border rounded-md p-2 w-full mt-2 focus:outline-none"
+                placeholder="https://yourdomain.com"
+              />
+            </div>
+
+            <div className="mt-10">
+              <div className="font-medium flex items-center gap-x-2">
+                <PiTwitterLogoFill className="text-2xl text-gray-600" />
+                <span>X</span>
+              </div>
+              <input
+                type="text"
+                value={twitter}
+                onChange={handleTwitterChange}
+                className="border rounded-md p-2 w-full mt-2 focus:outline-none"
+                placeholder="https://x.com"
+              />
+            </div>
+
+            <div className="mt-10">
+              <div className="font-medium flex items-center gap-x-2">
+                <PiDiscordLogoFill className="text-2xl text-gray-600" />
+                <span>Discord</span>
+              </div>
+              <input
+                type="text"
+                value={discord}
+                onChange={handleDiscordChange}
+                className="border rounded-md p-2 w-full mt-2 focus:outline-none"
+                placeholder="https://discord.com"
+              />
+            </div>
+          </div>
+        )}
+
+        {step === 7 && (
+          <div className="space-y-10">
+            <h1 className="text-4xl font-semibold"> 🔍 Review and submit</h1>
+            <p className="text-xl font-light mt-4 leading-8">
+              Review the details of your product and submit it to the world.
+              Your product will be reviewed by our team before it goes live.
+            </p>
+
+            <div className="mt-10 grid grid-cols-2 gap-8">
+              <div className="">
+                <div className="font-semibold">Name of the product</div>
+                <div className=" mt-2 text-gray-600">{name}</div>
+              </div>
+
+              <div className="">
+                <div className="font-semibold">Slug ( URL ) </div>
+                <div className=" mt-2 text-gray-600">{slug}</div>
+              </div>
+
+              <div className="">
+                <div className="font-semibold">Category</div>
+                <div className="  mt-2 text-gray-600">
+                  {selectedCategories.join(", ")}
+                </div>
+              </div>
+
+              <div>
+                <div className="font-semibold">Website URL</div>
+                <div className=" mt-2 text-gray-600">{website}</div>
+              </div>
+
+              <div className="">
+                <div className="font-semibold">Headline</div>
+                <div className="  mt-2 text-gray-600">{headline}</div>
+              </div>
+              <div className="">
+                <div className="font-semibold">Short description</div>
+                <div className=" mt-2 text-gray-600 ">{shortDescription}</div>
+              </div>
+
+              <div>
+                <div className="font-semibold">Twitter</div>
+                <div className=" mt-2 text-gray-600">{twitter}</div>
+              </div>
+
+              <div>
+                <div className="font-semibold">Discord</div>
+                <div className=" mt-2 text-gray-600">{discord}</div>
+              </div>
+
+              <div className="">
+                <div className="font-semibold">
+                  Release date - Pending Approval
+                </div>
+                <div className=" mt-2 text-gray-600">
+                  {date ? date.toDateString() : "Not specified"}
+                </div>
+              </div>
+
+              <div className="cols-span-2">
+                <div className="font-semibold">Product Images</div>
+                <div className="mt-2 md:flex gap-2 w-full">
+                  {uploadedProductImages.map((url, index) => (
+                    <div key={index} className="relative w-28 h-28">
+                      <Image
+                        priority
+                        src={url}
+                        alt="Uploaded Product Image"
+                        layout="fill"
+                        objectFit="cover"
+                        className="rounded-md"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {step === 8 && (
+          <div className="space-y-10">
+            <h1 className="text-4xl font-semibold">Congratulations 🎉</h1>
+            <p className="text-xl font-light mt-4 leading-8">
+              Your product has been successfully submitted. Our team will review
+              it and get back to your soon.
+            </p>
+            <div className="flex flex-col  gap-4">
+              <div
+                onClick={handleGoToProducts}
+                className="bg-[#ff6154] text-white py-2 px-4
+                 rounded mt-4 flex w-60 justify-center items-center cursor-pointer"
+              >
+                Go to your products
+              </div>
+
+              <Separator />
+
+              <div
+                onClick={submitAnotherProduct}
+                className="text-[#ff6154] py-2 px-4 rounded mt-4 
+                flex w-60 justify-center items-center cursor-pointer"
+              >
+                Submit another product
+              </div>
+            </div>
+          </div>
+        )}
+
+        {step !== 8 && (
+          <>
+            <div className="flex justify-between items-center mt-10 ">
+              {step !== 1 && (
+                <button onClick={prevStep} className="text-gray-600">
+                  Previous
+                </button>
+              )}
+
+              <div className="flex items-center">
+                {step === 7 ? (
+                  <button
+                    onClick={submitProduct}
+                    className="bg-[#ff6154] text-white py-2 px-4 rounded-md mt-4 items-end"
+                  >
+                    Submit
+                  </button>
+                ) : (
+                  <button
+                    onClick={nextStep}
+                    className="bg-[#ff6154] text-white py-2 px-4 rounded-md mt-4 items-end"
+                  >
+                    {step === 7 ? "Submit" : "Continue"}
+                  </button>
+                )}
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

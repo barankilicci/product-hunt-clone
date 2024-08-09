@@ -3,7 +3,7 @@ import { PiMagnifyingGlass } from "react-icons/pi";
 const Search = () => {
   return (
     <div className="rounded-full flex items-center text-gray-500 ml-4 bg-[#f5f8ff] relative">
-      <PiMagnifyingGlass classNameml-2 />
+      <PiMagnifyingGlass className="ml-2"/>
       <input
         type="text"
         placeholder="Search..."

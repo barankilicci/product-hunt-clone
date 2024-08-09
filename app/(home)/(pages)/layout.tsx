@@ -1,7 +1,8 @@
 import { auth } from "@/auth";
 import Navbar from "@/components/navbar/navbar";
+import { redirect } from "next/navigation";
 
-const HomeLayout = async ({
+const PagesLayout = async ({
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -10,8 +11,12 @@ const HomeLayout = async ({
 
   const authenticatedUser = await auth();
 
+  if(!authenticatedUser){
+    redirect("/")
+  }
+
   return (
-    <html lang="en" suppressHydrationWarning={true}>
+    <html lang="en">
       <body>
         <Navbar
              authenticatedUser={authenticatedUser}
@@ -22,4 +27,4 @@ const HomeLayout = async ({
   );
 };
 
-export default HomeLayout;
+export default PagesLayout;

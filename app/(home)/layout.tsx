@@ -13,9 +13,7 @@ const HomeLayout = async ({
   return (
     <html lang="en" suppressHydrationWarning={true}>
       <body>
-        <Navbar
-             authenticatedUser={authenticatedUser}
-        />
+        <Navbar authenticatedUser={authenticatedUser} />
         {children}
       </body>
     </html>

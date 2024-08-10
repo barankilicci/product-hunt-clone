@@ -83,3 +83,133 @@ export const createProduct = async ({
     return null;
   }
 };
+
+export const updateProduct = async (
+  productId: string,
+  {
+    name,
+    slug,
+    headline,
+    description,
+    logo,
+    releaseDate,
+    website,
+    twitter,
+    discord,
+    images,
+  }: ProductData
+) => {
+  const authenticatedUser = await auth();
+
+  if (!authenticatedUser) {
+    throw new Error("You must be signed in to update a product");
+  }
+
+  const product = await db.product.findUnique({
+    where: {
+      id: productId,
+    },
+  });
+
+  if (!product) {
+    throw new Error("Product not found");
+  }
+
+  await db.product.update({
+    where: {
+      id: productId,
+    },
+    data: {
+      name,
+      slug,
+      headline,
+      description,
+      logo,
+      releaseDate,
+      website,
+      twitter,
+      discord,
+      images: {
+        deleteMany: {
+          productId,
+        },
+        createMany: {
+          data: images.map((image) => ({ url: image })),
+        },
+      },
+      status: "PENDING",
+    },
+  });
+  return product;
+};
+
+export const getOwnerProducts = async () => {
+  const authenticatedUser = await auth();
+
+  if (!authenticatedUser) {
+    return [];
+  }
+
+  const userId = authenticatedUser.user?.id;
+
+  const products = await db.product.findMany({
+    where: {
+      userId,
+    },
+  });
+
+  return products;
+};
+
+export const getProductById = async (productId: string) => {
+  try {
+    const product = await db.product.findUnique({
+      where: {
+        id: productId,
+      },
+      include:{
+        categories:true,
+        images:true,
+      }
+    });
+
+    return product;
+  } catch (error) {
+    console.error(error);
+    return null
+  }
+};
+
+export const deleteProduct = async (productId: string) => {
+  const authenticatedUser = await auth();
+
+  if (
+    !authenticatedUser ||
+    !authenticatedUser.user ||
+    !authenticatedUser.user.id
+  ) {
+    throw new Error("User ID is missing or invalid");
+  }
+
+  const userId = authenticatedUser.user.id;
+
+  const product = await db.product.findUnique({
+    where: {
+      id: productId,
+    },
+  });
+
+  if (!product || product.userId !== userId) {
+    throw new Error("Product not found or not authorized");
+  }
+
+  await db.product.delete({
+    where: {
+      id: productId,
+    },
+    include: {
+      images: true,
+    },
+  });
+  return true;
+};

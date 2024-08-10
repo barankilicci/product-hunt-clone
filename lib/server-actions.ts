@@ -167,16 +167,16 @@ export const getProductById = async (productId: string) => {
       where: {
         id: productId,
       },
-      include:{
-        categories:true,
-        images:true,
-      }
+      include: {
+        categories: true,
+        images: true,
+      },
     });
 
     return product;
   } catch (error) {
     console.error(error);
-    return null
+    return null;
   }
 };
 
@@ -212,4 +212,18 @@ export const deleteProduct = async (productId: string) => {
     },
   });
   return true;
+};
+
+export const getPendingProducts = async () => {
+  const products = await db.product.findMany({
+    where: {
+      status: "PENDING",
+    },
+    include: {
+      categories: true,
+      images: true,
+    },
+  });
+
+  return products;
 };

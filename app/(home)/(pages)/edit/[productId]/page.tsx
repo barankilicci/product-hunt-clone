@@ -43,11 +43,11 @@ const ProductIdPage = async ({ params }: { params: IParams }) => {
             )}
 
             {product.status == "ACTIVE" && (
-              <Badge className="bg-green-400">Pending</Badge>
+              <Badge className="bg-green-400">Active</Badge>
             )}
 
             {product.status == "REJECTED" && (
-              <Badge className="bg-red-400">Pending</Badge>
+              <Badge className="bg-red-400">Rejected</Badge>
             )}
           </div>
         </div>

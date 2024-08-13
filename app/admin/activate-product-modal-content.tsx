@@ -30,6 +30,8 @@ const ActivateProductModalContent: React.FC<
           position: "top-center",
         }
       );
+      closeModal();
+      router.refresh();
     } catch (error) {
       console.log(error);
     }
@@ -46,7 +48,10 @@ const ActivateProductModalContent: React.FC<
           Once activated, the product will be visible to the public and users
           will be able to interact with it.
         </p>
-        <button className=" text-emerald-500 hover:underline">
+        <button
+          onClick={handleActivateButton}
+          className=" text-emerald-500 hover:underline"
+        >
           Click here to activate
         </button>
       </div>

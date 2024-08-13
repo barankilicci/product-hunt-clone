@@ -1,10 +1,12 @@
 "use client";
+import ProductModalContent from "@/components/product-modal-content";
 import ActivateProductModal from "@/components/ui/modals/activate-product-modal";
 import ProductModal from "@/components/ui/modals/product-modal";
 import RejectProductModal from "@/components/ui/modals/reject-product-modal";
 import Image from "next/image";
 import { useState } from "react";
 import { PiCheckCircle, PiXCircle } from "react-icons/pi";
+import ActivateProductModalContent from "./activate-product-modal-content";
 
 interface PendingProductsProps {
   pendingProducts: any;
@@ -134,16 +136,35 @@ const PendingProducts: React.FC<PendingProductsProps> = ({
           </div>
         ))}
 
-        <ProductModal visible={viewProductModalVisible} setVisible={setViewProductModalVisible}>
-            Product Modal
+        <ProductModal
+          visible={viewProductModalVisible}
+          setVisible={setViewProductModalVisible}
+        >
+          <ProductModalContent
+            currentProduct={currentProduct}
+            authenticatedUser={authenticatedUser}
+            hasUpvoted={false}
+            totalUpvotes={0}
+            setTotalUpvotes={() => {}}
+            setHasUpvoted={() => {}}
+          />
         </ProductModal>
 
-        <ActivateProductModal visible={activateProductModalVisible} setVisible={setActivateProductModalVisible}>
-            Activate Product Modal
+        <ActivateProductModal
+          visible={activateProductModalVisible}
+          setVisible={setActivateProductModalVisible}
+        >
+          <ActivateProductModalContent
+            currentProduct={currentProduct}
+            closeModal={() => setActivateProductModalVisible(false)}
+          />
         </ActivateProductModal>
 
-        <RejectProductModal visible={rejectProductModalVisible} setVisible={setRejectProductModalVisible}>
-            Reject Product Modal
+        <RejectProductModal
+          visible={rejectProductModalVisible}
+          setVisible={setRejectProductModalVisible}
+        >
+          Reject Product Modal
         </RejectProductModal>
       </div>
     </div>

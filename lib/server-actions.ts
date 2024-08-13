@@ -227,3 +227,79 @@ export const getPendingProducts = async () => {
 
   return products;
 };
+
+export const activateProduct = async(productId:string) =>{
+  try {
+    const product = await db.product.findUnique({
+      where:{
+        id:productId,
+      }
+    });
+
+    if(!product){
+      throw new Error("Product not found");
+    }
+
+    await db.product.update({
+      where:{
+        id:productId,
+      },
+      data:{
+        status: "ACTIVE",
+      },
+    });
+
+    await db.notification.create({
+      data:{
+        userId: product.userId,
+        body: `Your product ${product.name} has been activated.`,
+        type: "ACTIVATED",
+        status: "UNREAD",
+        profilePicture: product.logo,
+        productId:product.id,
+      }
+    })
+
+    return product;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+}
+
+export const rejectProduct = async(productId: string, reason:string) =>{
+  try {
+    const product = await db.product.findUnique({
+      where:{
+        id:productId,
+      },
+    });
+
+    if(!product){
+      throw new Error("Product not found or not authorized.")
+    }
+
+    await db.product.update({
+      where:{
+        id:productId,
+      },
+      data:{
+        status: "REJECTED",
+      }
+    });
+
+    await db.notification.create({
+      data:{
+        userId: product.userId,
+        body: `Your product "${product.name}" has been rejected. Reason: ${reason}`,
+        type: "REJECTED",
+        status: "UNREAD",
+        profilePicture: `${product.logo}`,
+        productId: productId,
+      }
+    })
+  } catch (error) {
+    console.error("Error rejecting product:" ,error)
+    throw error;
+  }
+}

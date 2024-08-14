@@ -1,17 +1,14 @@
-import { auth } from "@/auth";
-import Navbar from "@/components/navbar/navbar";
-import { Button } from "@/components/ui/button";
-import Image from "next/image";
+import ActiveProducts from "@/components/active-products";
+
+import { getActiveProducts } from "@/lib/server-actions";
 
 const Home = async () => {
-  const authenticatedUser = await auth();
-  
-  return (
-    <>
-      <div>
+  const activeProducts = await getActiveProducts();
 
-      </div>
-    </>
+  return (
+    <div className="md:w-3/5 mx-auto py-10 px-6">
+      <ActiveProducts activeProducts={activeProducts} />
+    </div>
   );
 };
 

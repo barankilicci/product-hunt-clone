@@ -228,100 +228,105 @@ export const getPendingProducts = async () => {
   return products;
 };
 
-export const activateProduct = async(productId:string) =>{
+export const activateProduct = async (productId: string) => {
   try {
     const product = await db.product.findUnique({
-      where:{
-        id:productId,
-      }
+      where: {
+        id: productId,
+      },
     });
 
-    if(!product){
+    if (!product) {
       throw new Error("Product not found");
     }
 
     await db.product.update({
-      where:{
-        id:productId,
+      where: {
+        id: productId,
       },
-      data:{
+      data: {
         status: "ACTIVE",
       },
     });
 
     await db.notification.create({
-      data:{
+      data: {
         userId: product.userId,
         body: `Your product ${product.name} has been activated.`,
         type: "ACTIVATED",
         status: "UNREAD",
         profilePicture: product.logo,
-        productId:product.id,
-      }
-    })
+        productId: product.id,
+      },
+    });
 
     return product;
   } catch (error) {
     console.error(error);
     return null;
   }
-}
+};
 
-export const rejectProduct = async(productId: string, reason:string) =>{
+export const rejectProduct = async (productId: string, reason: string) => {
   try {
     const product = await db.product.findUnique({
-      where:{
-        id:productId,
+      where: {
+        id: productId,
       },
     });
 
-    if(!product){
-      throw new Error("Product not found or not authorized.")
+    if (!product) {
+      throw new Error("Product not found or not authorized.");
     }
 
     await db.product.update({
-      where:{
-        id:productId,
+      where: {
+        id: productId,
       },
-      data:{
+      data: {
         status: "REJECTED",
-      }
+      },
     });
 
     await db.notification.create({
-      data:{
+      data: {
         userId: product.userId,
         body: `Your product "${product.name}" has been rejected. Reason: ${reason}`,
         type: "REJECTED",
         status: "UNREAD",
         profilePicture: `${product.logo}`,
         productId: productId,
-      }
-    })
+      },
+    });
   } catch (error) {
-    console.error("Error rejecting product:" ,error)
+    console.error("Error rejecting product:", error);
     throw error;
   }
-}
+};
 
-export const getActiveProducts = async () =>{
+export const getActiveProducts = async () => {
   const products = await db.product.findMany({
-    where:{
-      status:"ACTIVE",
+    where: {
+      status: "ACTIVE",
     },
-    include:{
-      categories:true,
-      images:true,
-      comments:{
-        include:{
-          user:true,
+    include: {
+      categories: true,
+      images: true,
+      comments: {
+        include: {
+          user: true,
+        },
+      },
+      upvotes: {
+        include: {
+          user: true,
         },
       },
     },
   });
 
   return products;
-}
+};
 
 export const commentOnProduct = async (
   productId: string,

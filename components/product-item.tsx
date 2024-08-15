@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import { useState } from "react";
-import { PiArrowBendDoubleUpRight, PiChatCircle } from "react-icons/pi";
+import { PiArrowBendDoubleUpRight, PiCaretUpFill, PiChatCircle } from "react-icons/pi";
 import ProductModal from "./ui/modals/product-modal";
 import ProductModalContent from "./product-modal-content";
 import Modal from "./ui/modals/modal";
@@ -21,6 +21,13 @@ const ProductItem: React.FC<ProductItemProps> = ({
   const [showProductModal, setShowProductModal] = useState(false);
   const [currentProduct, setCurrentProduct] = useState<any>(null);
 
+  const [hasUpvoted, setHasUpvoted] = useState(
+    product.upvoters?.includes(authenticatedUser?.user.id)
+  );
+
+  const [totalUpvotes, setTotalUpvotes] = useState(product.upvotes || 0);
+
+
   const handleProductItemClick = () => {
     if (!authenticatedUser) {
       setShowLoginModal(true);
@@ -30,15 +37,15 @@ const ProductItem: React.FC<ProductItemProps> = ({
     }
   };
 
-  const releaseDate =product.releaseDate && new Date(product.releaseDate);
+  const releaseDate = product.releaseDate && new Date(product.releaseDate);
 
   const currentDate = new Date();
 
   let displayReleaseDate;
 
-  if(releaseDate > currentDate){
+  if (releaseDate > currentDate) {
     displayReleaseDate = releaseDate.toDateString();
-  }else{
+  } else {
     displayReleaseDate = "Available Now";
   }
 
@@ -49,6 +56,12 @@ const ProductItem: React.FC<ProductItemProps> = ({
     e.stopPropagation();
     // Open the link in a new tab
     window.open(`${product.website}`, "_blank");
+  };
+
+  const handleCategoryClick = (
+    e: React.MouseEvent<HTMLAnchorElement, MouseEvent>
+  ) => {
+    e.stopPropagation();
   };
   return (
     <div
@@ -89,6 +102,7 @@ const ProductItem: React.FC<ProductItemProps> = ({
                     <div className="mr-1">•</div>
                     <Link
                       className="hover:underline"
+                      onClick={handleCategoryClick}
                       href={`/category/${category.toLowerCase()}`}
                     >
                       {category}
@@ -106,15 +120,30 @@ const ProductItem: React.FC<ProductItemProps> = ({
             </div>
           </div>
         </div>
+        <div className="text-sm">
+            <div className="">
+                {hasUpvoted ? (
+                    <div className="border px-2 rounded-md flex flex-col items-center bg-gradient-to-bl from-[#ff6154] to-[#ff4582] border-[#ff6154] text-white">
+                        <PiCaretUpFill className="text-xl"/>
+                        {totalUpvotes}
+                    </div>
+                ):(
+                    <div className="border px-2 rounded-md flex flex-col items-center">
+                        <PiCaretUpFill className="text-xl"/>
+                        {totalUpvotes}
+                    </div>  
+                )}
+            </div>
+        </div>
       </div>
       <ProductModal visible={showProductModal} setVisible={setShowProductModal}>
         <ProductModalContent
           currentProduct={currentProduct}
           authenticatedUser={authenticatedUser}
-          setTotalUpvotes={null}
-          totalUpvotes={null}
-          hasUpvoted={null}
-          setHasUpvoted={null}
+          setTotalUpvotes={setTotalUpvotes}
+          totalUpvotes={totalUpvotes}
+          hasUpvoted={hasUpvoted}
+          setHasUpvoted={setHasUpvoted} 
         />
       </ProductModal>
 

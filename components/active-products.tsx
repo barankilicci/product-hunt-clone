@@ -1,7 +1,6 @@
 import { auth } from "@/auth";
 import ProductItem from "./product-item";
 
-
 interface ActiveProductsProps {
   activeProducts: any;
 }
@@ -30,29 +29,27 @@ const ActiveProducts: React.FC<ActiveProductsProps> = async ({
       images,
       categories,
       comments,
-      upvotes
+      upvotes,
     } = product;
-
-
 
     const imageUrls = images.map((image: any) => image.url);
     const categoryNames = categories.map((category: any) => category.name);
     const commentsCount = comments ? comments.length : 0;
 
-    const commentText = comments ? comments.map((comment: any) => ({
-        id: comment.id,
-        profile: comment.profilePicture,
-        body : comment.body,
-        user : comment.user.name,
-        timestamp : comment.createdAt,
-        userId : comment.user.id,
-        name: comment.user.name.toLowerCase().replace(/\s/g, '_'),
+    const commentText = comments
+      ? comments.map((comment: any) => ({
+          id: comment.id,
+          profile: comment.profilePicture,
+          body: comment.body,
+          user: comment.user.name,
+          timestamp: comment.createdAt,
+          userId: comment.user.id,
+          name: comment.user.name.toLowerCase().replace(/\s/g, "_"),
+        }))
+      : [];
 
-    })) : [];
-
-
-    // const upvotesCount = upvotes ? upvotes.length : 0;
-    // const upvotesData = upvotes.map((upvote: any) => upvote.user.id)
+    const upvotesCount = upvotes ? upvotes.length : 0;
+    const upvotesData = upvotes.map((upvote: any) => upvote.user.id);
 
     return {
       id,
@@ -72,9 +69,9 @@ const ActiveProducts: React.FC<ActiveProductsProps> = async ({
       images: imageUrls,
       categories: categoryNames,
       commentsLength: commentsCount,
-      commentData : commentText,
-    //   upvoters: upvotesData,
-    //   upvotes: upvotesCount,
+      commentData: commentText,
+      upvoters: upvotesData,
+      upvotes: upvotesCount,
     };
   });
 
@@ -86,13 +83,12 @@ const ActiveProducts: React.FC<ActiveProductsProps> = async ({
 
       <div className="space-y-2 py-6 flex flex-col">
         {formattedActiveProducts?.map((product: any) => (
-            <ProductItem
+          <ProductItem
             key={product.id}
             product={product}
             authenticatedUser={authenticatedUser}
-            />
+          />
         ))}
-
       </div>
     </div>
   );

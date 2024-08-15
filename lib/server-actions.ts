@@ -473,3 +473,61 @@ export const upvoteProduct = async (productId: string) => {
     throw error;
   }
 };
+
+export const getUpvotedProducts = async () =>{
+  try {
+    const authenticatedUser = await auth();
+
+    if(
+      !authenticatedUser ||
+      !authenticatedUser.user ||
+      !authenticatedUser.user.id
+    ){
+      throw new Error("User ID is missing or invalid.");
+    }
+
+    const userId = authenticatedUser.user.id;
+
+    const upvotedProducts = await db.upvote.findMany({
+      where:{
+        userId,
+      },
+      include:{
+        product:true,
+      }
+    });
+
+    return upvotedProducts.map((upvote) => upvote.product)
+  } catch (error) {
+    console.error("Error getting upvoted products:", error);
+    return [];
+  }
+}
+
+export const getProductBySlug = async(slug:string) =>{
+  try {
+    const product = await db.product.findUnique({
+      where:{
+        slug,
+      },
+      include:{
+        images:true,
+        categories:true,
+        comments:{
+          include:{
+            user:true,
+          },
+        },
+        upvotes:{
+          include:{
+            user:true,
+          }
+        }
+      }
+    });
+    return product;
+  } catch (error) {
+    console.error("Error getting product by slug:", error)
+    return null;
+  }
+}

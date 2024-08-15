@@ -15,7 +15,7 @@ interface AvatarProps {
 
 const Avatar: React.FC<AvatarProps> = ({ authenticatedUser }) => {
   const handleMyUpvotes = () => {
-    window.location.href = "/my-upvotes";
+    window.location.href = "/my-upvoted";
   };
   return (
     <div>

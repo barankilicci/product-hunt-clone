@@ -1,12 +1,18 @@
 "use client";
 import Image from "next/image";
 import { useState } from "react";
-import { PiArrowBendDoubleUpRight, PiCaretUpFill, PiChatCircle } from "react-icons/pi";
+import {
+  PiArrowBendDoubleUpRight,
+  PiCaretUpFill,
+  PiChatCircle,
+} from "react-icons/pi";
 import ProductModal from "./ui/modals/product-modal";
 import ProductModalContent from "./product-modal-content";
 import Modal from "./ui/modals/modal";
 import AuthContent from "./navbar/auth-content";
 import Link from "next/link";
+import { upvoteProduct } from "@/lib/server-actions";
+import { motion } from "framer-motion";
 
 interface ProductItemProps {
   product: any;
@@ -26,7 +32,6 @@ const ProductItem: React.FC<ProductItemProps> = ({
   );
 
   const [totalUpvotes, setTotalUpvotes] = useState(product.upvotes || 0);
-
 
   const handleProductItemClick = () => {
     if (!authenticatedUser) {
@@ -62,6 +67,27 @@ const ProductItem: React.FC<ProductItemProps> = ({
     e: React.MouseEvent<HTMLAnchorElement, MouseEvent>
   ) => {
     e.stopPropagation();
+  };
+
+  const handleUpvoteClick = async (
+    e: React.MouseEvent<HTMLDivElement, MouseEvent>
+  ) => {
+    e.stopPropagation();
+
+    try {
+      await upvoteProduct(product.id);
+      setHasUpvoted(!hasUpvoted);
+      setTotalUpvotes(hasUpvoted ? totalUpvotes - 1 : totalUpvotes + 1);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const variants = {
+    initital: {
+      scale: 1,
+    },
+    upvoted: { scale: [1, 1.2, 1], transition: { duration: 0.3 } },
   };
   return (
     <div
@@ -121,19 +147,24 @@ const ProductItem: React.FC<ProductItemProps> = ({
           </div>
         </div>
         <div className="text-sm">
-            <div className="">
-                {hasUpvoted ? (
-                    <div className="border px-2 rounded-md flex flex-col items-center bg-gradient-to-bl from-[#ff6154] to-[#ff4582] border-[#ff6154] text-white">
-                        <PiCaretUpFill className="text-xl"/>
-                        {totalUpvotes}
-                    </div>
-                ):(
-                    <div className="border px-2 rounded-md flex flex-col items-center">
-                        <PiCaretUpFill className="text-xl"/>
-                        {totalUpvotes}
-                    </div>  
-                )}
-            </div>
+          <motion.div
+            variants={variants}
+            onClick={handleUpvoteClick}
+            animate={hasUpvoted ? "upvoted" : "initital"}
+            className=""
+          >
+            {hasUpvoted ? (
+              <div className="border px-2 rounded-md flex flex-col items-center bg-gradient-to-bl from-[#ff6154] to-[#ff4582] border-[#ff6154] text-white">
+                <PiCaretUpFill className="text-xl" />
+                {totalUpvotes}
+              </div>
+            ) : (
+              <div className="border px-2 rounded-md flex flex-col items-center">
+                <PiCaretUpFill className="text-xl" />
+                {totalUpvotes}
+              </div>
+            )}
+          </motion.div>
         </div>
       </div>
       <ProductModal visible={showProductModal} setVisible={setShowProductModal}>
@@ -143,7 +174,7 @@ const ProductItem: React.FC<ProductItemProps> = ({
           setTotalUpvotes={setTotalUpvotes}
           totalUpvotes={totalUpvotes}
           hasUpvoted={hasUpvoted}
-          setHasUpvoted={setHasUpvoted} 
+          setHasUpvoted={setHasUpvoted}
         />
       </ProductModal>
 

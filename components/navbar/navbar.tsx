@@ -13,6 +13,7 @@ import Submit from "./submit";
 
 interface NavbarProps {
   authenticatedUser?: any;
+  no
 }
 
 const Navbar: React.FC<NavbarProps> = ({ authenticatedUser }) => {

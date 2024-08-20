@@ -34,6 +34,9 @@ const MyProductsPage = async () => {
         <div>
           <h1 className="text-3xl font-bold">Your Products</h1>
           <p>Manage your products here.</p>
+          <p className="pt-6">
+            ({products.length} / 2) free products
+          </p>
           <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mt-10">
             {products.map((product) => (
               <Link href={`/edit/${product.id}`} key={product.id}>

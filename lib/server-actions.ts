@@ -681,3 +681,17 @@ export const markAllNotificationsAsRead = async () => {
     throw error;
   }
 };
+
+export const searchProducts = async (query: string) => {
+  const products = await db.product.findMany({
+    where: {
+      name: {
+        contains: query,
+        mode: "insensitive",
+      },
+      status: "ACTIVE",
+    },
+  });
+
+  return products;
+};

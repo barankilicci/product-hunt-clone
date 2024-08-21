@@ -653,3 +653,31 @@ export const getRankById = async (): Promise<
 
   return productsWithRanks;
 };
+
+export const markAllNotificationsAsRead = async () => {
+  try {
+    const authenticatedUser = await auth();
+
+    if (
+      !authenticatedUser ||
+      !authenticatedUser.user ||
+      !authenticatedUser.user.id
+    ) {
+      throw new Error("User ID is missing or invalid");
+    }
+
+    const userId = authenticatedUser?.user.id;
+
+    await db.notification.updateMany({
+      where: {
+        userId,
+      },
+      data: {
+        status: "READ",
+      },
+    });
+  } catch (error) {
+    console.error("Error marking all notifications as read:", error);
+    throw error;
+  }
+};

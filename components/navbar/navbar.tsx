@@ -13,10 +13,10 @@ import Submit from "./submit";
 
 interface NavbarProps {
   authenticatedUser?: any;
-  no
+  notifications?: any;
 }
 
-const Navbar: React.FC<NavbarProps> = ({ authenticatedUser }) => {
+const Navbar: React.FC<NavbarProps> = ({ authenticatedUser,notifications }) => {
   const [authModalVisible, setauthModalVisible] = useState(false);
   const handleButtonClick = () => {
     setauthModalVisible(true);
@@ -36,7 +36,7 @@ const Navbar: React.FC<NavbarProps> = ({ authenticatedUser }) => {
           {authenticatedUser ? (
             <>
             <Submit />
-            <NotificationIcon />
+            <NotificationIcon notifications={notifications}/>
               <Avatar authenticatedUser={authenticatedUser}/>
             </>
           ) : (

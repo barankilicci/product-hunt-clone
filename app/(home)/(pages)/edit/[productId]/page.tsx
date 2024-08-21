@@ -9,8 +9,6 @@ import DeleteProduct from "./delete-product";
 import {
   Card,
   CardContent,
-  CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -84,12 +82,10 @@ const ProductIdPage = async ({ params }: { params: IParams }) => {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle>Comments</CardTitle> 💬 
+            <CardTitle>Comments</CardTitle> 💬
           </CardHeader>
           <CardContent>
-            <div className="text-2xl">
-              {product.comments.length}
-            </div>
+            <div className="text-2xl">{product.comments.length}</div>
           </CardContent>
         </Card>
         <Card>
@@ -97,9 +93,7 @@ const ProductIdPage = async ({ params }: { params: IParams }) => {
             <CardTitle>Upvotes</CardTitle> 🔺
           </CardHeader>
           <CardContent>
-            <div className="text-2xl">
-              {product.upvotes.length}
-            </div>
+            <div className="text-2xl">{product.upvotes.length}</div>
           </CardContent>
         </Card>
       </div>
@@ -111,7 +105,7 @@ const ProductIdPage = async ({ params }: { params: IParams }) => {
 
       {product.comments.length > 0 ? (
         <div className="mt-4 space-y-4">
-          {product.comments.map((comment:any) =>(
+          {product.comments.map((comment: any) => (
             <div key={comment.id} className="border p-4 rounded-lg">
               <div className="flex gap-x-4 items-center">
                 <Image
@@ -129,10 +123,12 @@ const ProductIdPage = async ({ params }: { params: IParams }) => {
             </div>
           ))}
         </div>
-      ):(
+      ) : (
         <div className="pt-4">
           <h2 className="text-xl font-semibold">No comments yet</h2>
-          <p className="text-gray-500 pt-4">Be the first to comment on this product.</p>
+          <p className="text-gray-500 pt-4">
+            Be the first to comment on this product.
+          </p>
         </div>
       )}
     </div>
